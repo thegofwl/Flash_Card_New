@@ -10,20 +10,7 @@ from django.shortcuts import render
 from django.views import View
 
 from users.models import Config
-from words.models import Word
 
-
-@login_required
-def delete_account(request):
-    if request.method == 'POST':
-        confirmation = request.POST.get('confirmation')
-        withdrawal_button_value = request.POST.get('withdrawal_Button')  # 버튼의 입력값 받아오기
-        if confirmation == '회원탈퇴':
-            request.user.delete()  # 회원 삭제
-            logout(request)  # 로그아웃 처리
-        else:
-            return HttpResponse(f'탈퇴 요청이 잘못되었습니다. <br>"{withdrawal_button_value}"로 입력함<br>')
-    return HttpResponse('삭제되었습니다.')
 
 
 # 용석 작업 - 기존 작업 유지 하고 추가 작업 합니다. - 나중에 확인 하세요.
@@ -175,9 +162,6 @@ class ExamUtil:
         return render(request, 'system_message.html', context)
 
 
-def home(request):
-    return render(request, 'exams/home.html')
-
 
 def Information_Modification(request):
     return render(request, 'exams/Information_Modification.html')
@@ -186,19 +170,6 @@ def Information_Modification(request):
 def Withdrawal(request):
     return render(request, 'exams/Withdrawal.html')
 
-
-def Word_Practice(request):
-    return render(request, 'exams/Word_Practice.html')
-
-
-def Word_Practice_Set(request):
-    return render(request, 'exams/Word_Practice_Set.html')
-
-
-def Word_Test(request):
-    return render(request, 'exams/Word_Test.html')
-
-
 def Word_Test_History(request):
     return render(request, 'exams/Word_Test_History.html')
 
@@ -206,6 +177,3 @@ def Word_Test_History(request):
 def Word_Test_Score(request):
     return render(request, 'exams/Word_Test_Score.html')
 
-
-def Word_Test_Set(request):
-    return render(request, 'exams/Word_Test_Set.html')

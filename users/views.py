@@ -8,8 +8,20 @@ from django.contrib.auth.forms import SetPasswordForm
 #회원가입 비밀번호 조건 안맞을 시 표시
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
-
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        confirmation = request.POST.get('confirmation')
+        withdrawal_button_value = request.POST.get('withdrawal_Button')  # 버튼의 입력값 받아오기
+        if confirmation == '회원탈퇴':
+            request.user.delete()  # 회원 삭제
+            logout(request)  # 로그아웃 처리
+        else:
+            return HttpResponse(f'탈퇴 요청이 잘못되었습니다. <br>"{withdrawal_button_value}"로 입력함<br>')
+    return HttpResponse('삭제되었습니다.')
 
 def sign_in(request):
     if request.method == "GET":

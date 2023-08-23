@@ -3,6 +3,7 @@ from django.db import models
 
 class Exam(models.Model):
     # id = models.IntegerField(primary_key=True, auto_created=True)  -> id 는 자동 생성됨
+    exam_type = models.CharField(max_length=10, default='en')
     in_word = models.CharField(max_length=50)
     exam_right = models.BooleanField()
     exam_point = models.DecimalField(max_digits=3, decimal_places=2)

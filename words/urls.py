@@ -8,4 +8,5 @@ urlpatterns = [
     path("word-save/", views.WordSave.as_view(), name="word-save"),
     path("word/<int:word_id>/", views.WordEdit.as_view(), name="word-edit"),
     path("word-clear/", views.WordClear.as_view(), name="word-clear"),
+    path("word-reset/", views.WordReset.as_view(), name="word-reset"),
 ]

@@ -121,7 +121,6 @@ class WordEdit(LoginRequiredMixin, View):
 class WordClear(LoginRequiredMixin, View):
     login_url = 'login'  # 로그인 페이지 URL 설정
 
-
     def get(self, request):
         return render(request, 'words/word_clear.html')
 
@@ -132,6 +131,31 @@ class WordClear(LoginRequiredMixin, View):
             Word.objects.all().delete()
             with connection.cursor() as cursor:
                 cursor.execute("DELETE FROM sqlite_sequence WHERE name = 'words_word'")
+            return redirect('words')  # Redirect to the desired URL
+        else:
+            return WordUtil.get_system_message_render(request, "비밀번호 오류 ", 'words')
+
+
+class WordReset(LoginRequiredMixin, View):
+    login_url = 'login'  # 로그인 페이지 URL 설정
+
+    def get(self, request):
+        return render(request, 'words/word_reset.html')
+
+    def post(self, request):
+        clear_password = 'qwer1234'
+        get_password = request.POST.get('clear_password')
+        if clear_password == get_password:
+            Word.objects.all().delete()
+            with connection.cursor() as cursor:
+                cursor.execute("DELETE FROM sqlite_sequence WHERE name = 'words_word'")
+
+            try:
+                sql_file_path = 'Report/word_data_insert.sql'  # SQL 파일 경로 설정
+                WordUtil.insert_data_from_sql_file(sql_file_path)
+            except Exception as e:
+                print(e)
+
             return redirect('words')  # Redirect to the desired URL
         else:
             return WordUtil.get_system_message_render(request, "비밀번호 오류 ", 'words')
@@ -210,6 +234,14 @@ class WordUtil:
     def get_system_message_render(request, error_message, set_urls):
         context = {'system_message': error_message, 'set_urls': set_urls}
         return render(request, 'system_message.html', context)
+
+    @staticmethod
+    def insert_data_from_sql_file(sql_file_path):
+        with open(sql_file_path, 'r', encoding='utf-8') as f:
+            sql_queries = f.read()
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql_queries)
 
 
 """

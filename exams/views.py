@@ -4,21 +4,9 @@ from django.shortcuts import render
 from django.views import View
 
 from users.models import Config
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
-from django.http import HttpResponse
 
-@login_required
-def delete_account(request):
-    if request.method == 'POST':
-        confirmation = request.POST.get('confirmation')
-        withdrawal_button_value = request.POST.get('withdrawal_Button')  # 버튼의 입력값 받아오기
-        if confirmation == '회원탈퇴':
-            request.user.delete()  # 회원 삭제
-            logout(request)  # 로그아웃 처리
-        else:
-            return HttpResponse(f'탈퇴 요청이 잘못되었습니다. <br>"{withdrawal_button_value}"로 입력함<br>')
-    return HttpResponse('삭제되었습니다.')
+
+
 
 class ExamsSetting(LoginRequiredMixin, View):
     #      LoginRequiredMixin 로그인 되어 있는지 확인하고 안되어 있으면 러그린 화면으로 가는 class
@@ -68,9 +56,6 @@ class ExamUtil:
         config.save()
 
 
-def home(request):
-    return render(request, 'exams/home.html')
-
 
 def Information_Modification(request):
     return render(request, 'exams/Information_Modification.html')
@@ -79,19 +64,6 @@ def Information_Modification(request):
 def Withdrawal(request):
     return render(request, 'exams/Withdrawal.html')
 
-
-def Word_Practice(request):
-    return render(request, 'exams/Word_Practice.html')
-
-
-def Word_Practice_Set(request):
-    return render(request, 'exams/Word_Practice_Set.html')
-
-
-def Word_Test(request):
-    return render(request, 'exams/Word_Test.html')
-
-
 def Word_Test_History(request):
     return render(request, 'exams/Word_Test_History.html')
 
@@ -99,6 +71,3 @@ def Word_Test_History(request):
 def Word_Test_Score(request):
     return render(request, 'exams/Word_Test_Score.html')
 
-
-def Word_Test_Set(request):
-    return render(request, 'exams/Word_Test_Set.html')

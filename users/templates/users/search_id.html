@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">ID 찾기</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="first_name">이름</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="last_name">성</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name">
+                        </div>
+                        <button type="submit" class="btn btn-primary">아이디 찾기</button>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{% url 'login' %}">로그인</a>
+                </div>
+                {% if id_found %}
+                    <div class="alert alert-success mt-3" role="alert">
+                        찾은 ID: {{ found_id }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

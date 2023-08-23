@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<table class="container table table-hover table-striped table-bordered text-center mt-5">
+    <thead>
+    <tr>
+        <th scope="col" class="text-center">번호</th>
+        <th scope="col" class="text-center">영어단어</th>
+        <th scope="col" class="text-center">영어발음</th>
+        <th scope="col" class="text-center">품사</th>
+        <th scope="col" class="text-center">한글발음</th>
+        <th scope="col" class="text-center">단어뜻1</th>
+        <th scope="col" class="text-center">단어뜻2</th>
+        <th scope="col" class="text-center">로마자</th>
+        <th scope="col" class="text-center">삭제</th>
+    </tr>
+    </thead>
+    {% for word in word_list %}
+    <tr>
+        <td scope="col" class="text-center"><span>{{ word.id }}</span></td>
+        <td scope="col" class="text-center"><a href="{% url 'word-edit' word.id %}"><span>{{ word.en_word }}</span></a></td>
+        <td scope="col" class="text-center"><span>[{{ word.en_phonetic }}]</span></td>
+        <td scope="col" class="text-center"><span>({{word.word_class}})</span></td>
+        <td scope="col" class="text-center"><span>{{ word.ko_phonetic }}</span></td>
+        <td scope="col" class="text-center"><span>{{ word.ko_word_1 }}</span></td>
+        <td scope="col" class="text-center"><span>{{ word.ko_word_2 }}</span></td>
+        <td scope="col" class="text-center"><span>[{{ word.ko_romanize }}]</span></td>
+        <td scope="col" class="text-center">
+            <form action="{% url 'words' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="word_id" value="{{ word.id }}">
+                <button type="submit" class="btn btn-danger btn-sm">del</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<div class="container text-center">
+    <span>
+        {% if word_list.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ word_list.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span>
+            Page {{ word_list.number }} of {{ word_list.paginator.num_pages }}.
+        </span>
+
+        {% if word_list.has_next %}
+            <a href="?page={{ word_list.next_page_number }}">next</a>
+            <a href="?page={{ word_list.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+{% endblock content %}

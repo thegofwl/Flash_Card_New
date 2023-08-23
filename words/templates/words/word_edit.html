@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card my-4">
+                <div class="card-header text-center">
+                    <h4><b>단 어 수 정</b></h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'word-edit' word.id %}">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <label for="en_word" class="col-sm-3 col-form-label">영어 단어:</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="en_word" name="en_word" value="{{ word.en_word }}"
+                                       class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="en_phonetic" class="col-sm-3 col-form-label">영어 발음:</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="en_phonetic" name="en_phonetic"
+                                       value="{{ word.en_phonetic }}" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="word_class" class="col-sm-3 col-form-label">품사:</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="word_class" name="word_class"
+                                       value="{{ word.word_class }}" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="ko_phonetic" class="col-sm-3 col-form-label">한글 발음:</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="ko_phonetic" name="ko_phonetic"
+                                       value="{{ word.ko_phonetic }}" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="ko_word_1" class="col-sm-3 col-form-label">단어 뜻 1:</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="ko_word_1" name="ko_word_1"
+                                       value="{{ word.ko_word_1 }}" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="ko_word_2" class="col-sm-3 col-form-label">단어 뜻 2:</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="ko_word_2" name="ko_word_2"
+                                       value="{{ word.ko_word_2 }}" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="ko_romanize" class="col-sm-3 col-form-label">로마자:</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="ko_romanize" name="ko_romanize"
+                                       value="{{ word.ko_romanize }}" class="form-control" required>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary mr-5" style="margin-right: 30px;">수 정 하 기</button>
+                            <a href="{% url 'words' %}" class="btn btn-secondary ml-2">취 소</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+

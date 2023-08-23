@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+{%load static %}
+<html lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>     <!--브라우저 렌더링 엔진 최신 버전으로-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <!--반응형 웹디자인 위한 viewport 설정-->
+    <meta name="description" content="내용내용"/>      <!--웹 페이지의 간단한 설명을 제공하는 메타 태그-->
+    <meta name="author" content="작가작가"/>   <!--웹 페이지의 작성자 정보를 나타내는 메타 태그-->
+    <title>index</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
+    <!--외부 CSS 파일 simple-datatables 라이브러리의 스타일 파일-->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet"/>      <!--Django의 템플릿 태그를 사용하여 정적 파일 호출-->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <!--외부 JavaScript 파일/Font Awesome 아이콘 라이브러리///External CSS file link code-->
+</head>
+
+
+<body class="sb-nav-fixed">
+
+<header>
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="{% url 'index' %}">Flash Card</a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
+                class="fas fa-bars"></i></button>
+        <!-- Navbar-->
+        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                       data-bs-toggle="dropdown"
+                       aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#!">Settings</a></li>
+                        <li><a class="dropdown-item" href="#!">Activity Log</a></li>
+                        <li>
+                            <hr class="dropdown-divider"/>
+                        </li>
+                        <li><a class="dropdown-item" href="#!">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </form>
+    </nav>
+</header>
+
+<div id="layoutSidenav">
+    <div id="layoutSidenav_nav">
+        <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+            <div class="sb-sidenav-menu">
+                <div class="nav">
+                    <div class="sb-sidenav-menu-heading">회원관리</div>
+                    <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false"
+                       aria-controls="collapsePages">
+                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                        계정 정보
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    {% if user.is_authenticated %}
+                        <div class="collapse" id="collapsePages" aria-labelledby="headingTwo"
+                             data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{% url 'Information_Modification' %}">회원정보 수정</a>
+                                <a class="nav-link" href="{% url 'Withdrawal' %}">회원 탈퇴</a>
+                            </nav>
+                        </div>
+                    {% else %}
+                        <div class="collapse" id="collapsePages" aria-labelledby="headingTwo"
+                             data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{% url 'login' %}">로그인</a>
+                                <a class="nav-link" href="{% url 'register' %}">회원 가입</a>
+                            </nav>
+                        </div>
+                    {% endif %}
+                    <div class="sb-sidenav-menu-heading">단어 연습 관리</div>
+                    <a class="nav-link collapsed" href="{% url 'trains-setting' %}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                        단어 연습
+                    </a>
+                    <div class="sb-sidenav-menu-heading">단어 테스트 관리</div>
+                    <a class="nav-link" href="{% url 'exam-setting' %}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                        단어 테스트
+                    </a>
+                    <a class="nav-link" href="{% url 'Word_Test_Score' %}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                        테스트 점수
+                    </a>
+                    <a class="nav-link" href="{% url 'Word_Test_History' %}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                        테스트 이력
+                    </a>
+
+                    <div class="sb-sidenav-menu-heading">words</div>
+                    <a class="nav-link" data-bs-toggle="collapse" data-bs-target="#words" aria-expanded="false"
+                       aria-controls="collapsePages">
+                        <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></i></div>
+                        단어입력
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="words" aria-labelledby="headingTwo"
+                         data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="{% url 'words' %}">단어 목록</a>
+                            <a class="nav-link" href="{% url 'word-input' %}">단어 입력</a>
+                            <a class="nav-link" href="{% url 'word-clear' %}">전체 단어 삭제</a>
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+            <div class="sb-sidenav-footer">
+                {% if user.is_authenticated %}
+                환영합니다, {{ user.username }}님! <br>로그인 되었습니다.
+                {% else %}
+                    로그인 후 이용가능
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+    <div id="layoutSidenav_content">
+
+        <!--MAIN START-->
+        <main>
+            {%block content%}
+            {%endblock content%}
+        </main>
+
+        <!--FOOTER START-->
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid px-4">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted">Copyright &copy; Your Website 2023</div>
+                    <div>
+                        <a href="#">Privacy Policy</a>
+                        &middot;
+                        <a href="#">Terms &amp; Conditions</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+<script src="{% static 'js/scripts.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+<script src="{% static 'assets/demo/chart-area-demo.js' %}"></script>
+<script src="{% static 'assets/demo/chart-bar-demo.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+        crossorigin="anonymous"></script>
+<script src="{% static 'js/datatables-simple-demo.js' %}"></script>
+
+
+</body>
+</html>

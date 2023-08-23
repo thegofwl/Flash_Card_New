@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>회원탈퇴</h1>
+    <p>정말로 회원 탈퇴하시겠습니까?</p>
+    <form method="post" action="{% url 'delete_account' %}">
+        {% csrf_token %}
+        <input type="text" name="confirmation" id="confirmation" placeholder="회원탈퇴" required>
+        <button type="submit" id="withdrawal_Button" name="withdrawal_Button" value="회원탈퇴">회원 탈퇴</button>
+    </form>
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Flash Card Index Html</h1>
+<div class="text-center mt-4">
+    {% if user.is_authenticated %}
+        <h2>환영합니다, {{ user.username }}님! 로그인 되었습니다.</h2>
+        <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+        {% else %}
+            <h2><a href="{% url 'login' %}" class="btn btn-primary">로그인</a>후 이용가능</h2>
+            <a href="{% url 'register' %}" class="btn btn-primary">회원가입</a>
+
+    {% endif %}
+    {% endblock content %}
+</div>
+

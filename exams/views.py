@@ -148,7 +148,7 @@ class ExamUtil:
         return exam_type
 
     @staticmethod
-    def get_conceal_en_word(en_word):   # 정우림님 제작 메소드
+    def get_conceal_en_word(en_word):   # 장우림님 제작 메소드
         letter_list = list(en_word)
         word_length = len(en_word)
         num_concealed = random.randrange(word_length // 3, word_length // 2 + 1)

@@ -1,4 +1,5 @@
 import random
+from datetime import timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
@@ -125,6 +126,7 @@ class WordPracticeHistory(View):
                                                                             'id_word__ko_word_1').annotate(
             total_practice=Count('id_word__ko_word_1')).order_by('-total_practice')[:10]
 
+        from django.utils.datetime_safe import datetime
         today = datetime.now().date()  # 현재 날짜를 가져옵니다.
         practice_data = []  # 그래프 데이터를 저장할 빈 리스트를 만듭니다.
 
@@ -139,6 +141,8 @@ class WordPracticeHistory(View):
             practice_data.append({"date": target_date.strftime("%Y-%m-%d"), "session_count": session_count})
 
             # practice_data를 JSON 형식으로 변환하여 컨텍스트에 추가합니다.
+
+            import json
             practice_data_json = json.dumps(practice_data)
 
         context = {

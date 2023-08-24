@@ -1,15 +1,16 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.shortcuts import render, redirect
-from .forms import LoginForm, RegisterForm
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import SetPasswordForm
-
-#회원가입 비밀번호 조건 안맞을 시 표시
+from django.contrib.auth.models import User
+# 회원가입 비밀번호 조건 안맞을 시 표시
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.shortcuts import render, redirect
+
+from .forms import LoginForm, RegisterForm
+
 
 @login_required
 def delete_account(request):
@@ -22,6 +23,7 @@ def delete_account(request):
         else:
             return HttpResponse(f'탈퇴 요청이 잘못되었습니다. <br>"{withdrawal_button_value}"로 입력함<br>')
     return HttpResponse('삭제되었습니다.')
+
 
 def sign_in(request):
     if request.method == "GET":
@@ -41,9 +43,11 @@ def sign_in(request):
         messages.error(request, f"유효하지 않은 아이디 또는 비밀번호입니다.")
         return render(request, 'users/login.html', {'form': form})
 
+
 def user_logout(request):
     logout(request)
     return redirect('login')  # 로그아웃 후 로그인 페이지로 리디렉션
+
 
 def register(request):
     if request.method == "GET":
@@ -55,7 +59,7 @@ def register(request):
         if form.is_valid():  # 폼이 유효한지 확인
             user = form.save(commit=False)  # 폼을 기반으로 User 모델 인스턴스 생성 (아직 저장하지 않음)
             user.username = user.username.lower()  # 사용자명을 소문자로 변환하여 저장
-            #비밀번호 검증 추가
+            # 비밀번호 검증 추가
             password = form.cleaned_data.get('password1')
             try:
                 validate_password(password, user=user)
@@ -81,10 +85,11 @@ def search_id(request):
             user = User.objects.get(first_name=first_name, last_name=last_name)  # 이름과 성으로 사용자 검색
             id_found = True  # 아이디를 찾았음을 표시
             found_id = user.username  # 찾은 사용자의 아이디 저장
-            messages.success(request, f"{first_name+last_name}님의 아이디를 찾았습니다.")  # 성공 메시지 추가
+            messages.success(request, f"{first_name + last_name}님의 아이디를 찾았습니다.")  # 성공 메시지 추가
         except User.DoesNotExist:  # 해당 조건의 사용자가 없는 경우
             messages.error(request, f"입력한 이름과 성에 해당하는 사용자가 없습니다.")  # 에러 메시지 추가
-    return render(request,'users/search_id.html', {'id_found': id_found, 'found_id': found_id})
+    return render(request, 'users/search_id.html', {'id_found': id_found, 'found_id': found_id})
+
 
 # 사용자 검증과 비밀번호 재설정 함수
 def check_user_and_reset_password(request, user, new_password):
@@ -117,6 +122,7 @@ def check_user(request):
             messages.error(request, f"해당 이름 또는 이메일로 된 사용자가 없습니다.")
     return render(request, 'users/find_password.html', {'password_found': False})
 
+
 # 비밀번호 재설정 뷰
 def find_password(request):
     if request.method == "POST" and request.POST.get('new_password'):
@@ -133,9 +139,5 @@ def find_password(request):
     return render(request, 'users/find_password.html', {'password_found': False})
 
 
-
-
 def index(request):
     return render(request, 'users/index.html')
-
-

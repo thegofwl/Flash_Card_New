@@ -1,29 +1,13 @@
 import random
 
-from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import model_to_dict
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
 
 from users.models import Config
 from words.models import Word
-
-
-@login_required
-def delete_account(request):
-    if request.method == 'POST':
-        confirmation = request.POST.get('confirmation')
-        withdrawal_button_value = request.POST.get('withdrawal_Button')  # 버튼의 입력값 받아오기
-        if confirmation == '회원탈퇴':
-            request.user.delete()  # 회원 삭제
-            logout(request)  # 로그아웃 처리
-        else:
-            return HttpResponse(f'탈퇴 요청이 잘못되었습니다. <br>"{withdrawal_button_value}"로 입력함<br>')
-    return HttpResponse('삭제되었습니다.')
 
 
 # 용석 작업 - 기존 작업 유지 하고 추가 작업 합니다. - 나중에 확인 하세요.
@@ -161,7 +145,7 @@ class ExamUtil:
         return exam_type
 
     @staticmethod
-    def get_conceal_en_word(en_word):   # 정우림님 제작 메소드
+    def get_conceal_en_word(en_word):  # 장우림님 제작 메소드
         letter_list = list(en_word)
         word_length = len(en_word)
         num_concealed = random.randrange(word_length // 3, word_length // 2 + 1)

@@ -1,56 +1,74 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<table class="container table table-hover table-striped table-bordered text-center mt-5">
-    <thead>
-    <tr>
-        <th scope="col" class="text-center">번호</th>
-        <th scope="col" class="text-center">영어단어</th>
-        <th scope="col" class="text-center">영어발음</th>
-        <th scope="col" class="text-center">품사</th>
-        <th scope="col" class="text-center">한글발음</th>
-        <th scope="col" class="text-center">단어뜻1</th>
-        <th scope="col" class="text-center">단어뜻2</th>
-        <th scope="col" class="text-center">로마자</th>
-        <th scope="col" class="text-center">삭제</th>
-    </tr>
-    </thead>
-    {% for word in word_list %}
-    <tr>
-        <td scope="col" class="text-center"><span>{{ word.id }}</span></td>
-        <td scope="col" class="text-center"><a href="{% url 'word-edit' word.id %}"><span>{{ word.en_word }}</span></a></td>
-        <td scope="col" class="text-center"><span>[{{ word.en_phonetic }}]</span></td>
-        <td scope="col" class="text-center"><span>({{word.word_class}})</span></td>
-        <td scope="col" class="text-center"><span>{{ word.ko_phonetic }}</span></td>
-        <td scope="col" class="text-center"><span>{{ word.ko_word_1 }}</span></td>
-        <td scope="col" class="text-center"><span>{{ word.ko_word_2 }}</span></td>
-        <td scope="col" class="text-center"><span>[{{ word.ko_romanize }}]</span></td>
-        <td scope="col" class="text-center">
-            <form action="{% url 'words' %}" method="post">
-                {% csrf_token %}
-                <input type="hidden" name="word_id" value="{{ word.id }}">
-                <button type="submit" class="btn btn-danger btn-sm">del</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-<div class="container text-center">
-    <span>
-        {% if word_list.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ word_list.previous_page_number }}">previous</a>
-        {% endif %}
+<div class="container mt-5 ">
+    <div class="row justify-content-center">
+        <div class="col-md-10 mx-auto">
+            <div class="card my-4">
+                <div class="card-header text-center">
+                    <h4><b>단어 목록</b></h4>
+                </div>
+                <div class="card-body mt-3 mb-3">
+                    <!-- 테이블 내용 -->
+                    <table class="table table-hover table-striped table-bordered text-center">
+                        <thead>
+                        <tr>
+                            <th scope="col" class="text-center">번호</th>
+                            <th scope="col" class="text-center">영어단어</th>
+                            <th scope="col" class="text-center">영어발음</th>
+                            <th scope="col" class="text-center">품사</th>
+                            <th scope="col" class="text-center">한글발음</th>
+                            <th scope="col" class="text-center">단어뜻1</th>
+                            <th scope="col" class="text-center">단어뜻2</th>
+                            <th scope="col" class="text-center">로마자</th>
+                            <th scope="col" class="text-center">삭제</th>
+                        </tr>
+                        </thead>
+                        {% for word in word_list %}
+                        <tr>
+                            <td scope="col" class="text-center"><span>{{ word.id }}</span></td>
+                            <td scope="col" class="text-center"><a href="{% url 'word-edit' word.id %}"><span>{{ word.en_word }}</span></a>
+                            </td>
+                            <td scope="col" class="text-center"><span>[{{ word.en_phonetic }}]</span></td>
+                            <td scope="col" class="text-center"><span>({{word.word_class}})</span></td>
+                            <td scope="col" class="text-center"><span>{{ word.ko_phonetic }}</span></td>
+                            <td scope="col" class="text-center"><span>{{ word.ko_word_1 }}</span></td>
+                            <td scope="col" class="text-center"><span>{{ word.ko_word_2 }}</span></td>
+                            <td scope="col" class="text-center"><span>[{{ word.ko_romanize }}]</span></td>
+                            <td scope="col" class="text-center">
+                                <form action="{% url 'words' %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="word_id" value="{{ word.id }}">
+                                    <button type="submit" class="btn btn-danger btn-sm">del</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <div class="container text-center mt-3">
+                        <span>
+                            {% if word_list.has_previous %}
+                                <a href="?page=1">&laquo; first</a>
+                                <a href="?page={{ word_list.previous_page_number }}">previous</a>
+                            {% endif %}
 
-        <span>
-            Page {{ word_list.number }} of {{ word_list.paginator.num_pages }}.
-        </span>
+                            <span>
+                                Page {{ word_list.number }} of {{ word_list.paginator.num_pages }}.
+                            </span>
 
-        {% if word_list.has_next %}
-            <a href="?page={{ word_list.next_page_number }}">next</a>
-            <a href="?page={{ word_list.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-    </span>
+                            {% if word_list.has_next %}
+                                <a href="?page={{ word_list.next_page_number }}">next</a>
+                                <a href="?page={{ word_list.paginator.num_pages }}">last &raquo;</a>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <!-- 테이블 내용 -->
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 {% endblock content %}

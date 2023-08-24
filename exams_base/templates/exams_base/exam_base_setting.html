@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5 ">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card my-4">
+                <div class="card-header text-center">
+                    <h4><b>단 어 TEST 설 정</b></h4>
+                </div>
+                <div class="card-body">
+                    <form class="form-inline" action="{% url 'exam_base-setting' %}" method="post" id="exam_setting_form">
+                        {% csrf_token %}
+
+                        <div class="row mb-3">
+                            <label for="exam_word_count" class="col-sm-3 col-form-label">TEST 단어 갯수</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="exam_word_count" name="exam_word_count"
+                                       value="{{ config.exam_word_count }}"
+                                       class="form-control" placeholder="단어 갯수을 입력하세요(단어 범위 보다 작으면 랜덤 선택 됩니다.)"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="exam_seconds" class="col-sm-3 col-form-label">단어 표시 시간</label>
+                            <div class="col-sm-9">
+                                <input type="text" id="exam_seconds" name="exam_seconds"
+                                       value="{{ config.exam_seconds }}"
+                                       min="1" max="30"
+                                       class="form-control" placeholder="문제를 맞히는데 주어질 시간을 선택하세요"
+                                       required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="exam_types" class="col-sm-3 col-form-label">TEST 유형</label>
+                            <div class="col-sm-9">
+                                <select id="exam_types" name="exam_types" class="form-control" required onchange="showHintSelect()">
+                                    <option value="" disabled selected>TEST 유형을 선택하세요</option>
+                                    <option value="ko">영어단어 제시</option>
+                                    <option value="en">한글 뜻 제시</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="hintSelect" style="display: none;">
+                            <div class="row mb-3">
+                                <label for="hint_type" class="col-sm-3 col-form-label">힌트</label>
+                                <div class="col-sm-9">
+                                    <select id="hint_type" name="hint_type" class="form-control" required>
+                                        <option value="0" disabled selected>HINT 유형을 선택하세요</option>
+                                        <option value="0">없음</option>
+                                        <option value="1">글자 수 표시</option>
+                                        <option value="2">일부분 표시</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label class="col-sm-3 col-form-label">TTS 음성 재생</label>
+                            <div class="col-sm-9">
+                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-light active">
+                                        <input type="radio" name="exam_tts_play" value="True"
+                                               {% if config.exam_tts_play %}checked{% endif %}> 음성 재생
+                                    </label>
+                                    <label class="btn btn-light">
+                                        <input type="radio" name="exam_tts_play" value="False"
+                                               {% if not config.exam_tts_play %}checked{% endif %}> 음성 재생 안 함
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary mt-3">단어 TEST 시작</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("exam_setting_form").addEventListener("submit", function(event) {
+        var numberInput = document.getElementById("exam_seconds").value;
+
+        if (parseInt(numberInput) > 30) {
+            alert("30초보다 작은 값을 입력해 주세요.");
+            event.preventDefault();
+        }
+        else if (parseInt(numberInput) < 1) {
+            alert("1초보다 큰 값을 입력해 주세요.");
+            event.preventDefault();
+        }
+    });
+</script>
+
+<script>
+    function showHintSelect() {
+        var examTypeSelect = document.getElementById("exam_types");
+        var hintSelect = document.getElementById("hintSelect");
+
+        if (examTypeSelect.value === "en") {
+            hintSelect.style.display = "block";
+        } else {
+            hintSelect.style.display = "none";
+        }
+    }
+</script>
+
+{% endblock content %}

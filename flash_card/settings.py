@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "words",
     "trains",
     "exams",
+    "exams_base",
 ]
 
 MIDDLEWARE = [

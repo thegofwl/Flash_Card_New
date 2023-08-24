@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import model_to_dict
 from django.shortcuts import render
 from django.views import View
+from gtts import gTTS
 
 from exams.models import Exam
 from users.models import Config
@@ -45,13 +46,15 @@ class ExamsSetting(LoginRequiredMixin, View):
             config.id_user = user
             ExamUtil.config_save(config, config_data_dict)
 
+        ExamUtil.is_tts_play = exam_tts_play
+
         exam_count = int(exam_word_count)
         ExamUtil.exam_difficulty = int(exam_difficulty)
         all_words = Word.objects.all()
         ExamUtil.exam_word_list = random.sample(list(all_words), exam_count)  # 중복 없는 랜덤 Word 리스트 생성
         exam_word_dict = ExamUtil.get_exam_word_dict(ExamUtil.exam_word_list[0])
         ExamUtil.exam_word_difficulty = ExamUtil.set_exam_word_difficulty(exam_word_dict)
-        context = {'exam_word': ExamUtil.exam_word_difficulty, 'show_num': 1}
+        context = {'exam_word': ExamUtil.exam_word_difficulty, 'show_num': 1, 'is_tts_play': ExamUtil.is_tts_play}
         return render(request, 'exams/exams_show.html', context)
 
 
@@ -80,7 +83,8 @@ class ExamsShow(LoginRequiredMixin, View):
         if show_num < len(ExamUtil.exam_word_list):
             exam_word_dict = ExamUtil.get_exam_word_dict(ExamUtil.exam_word_list[show_num])
             ExamUtil.exam_word_difficulty = ExamUtil.set_exam_word_difficulty(exam_word_dict)
-            context = {'exam_word': ExamUtil.exam_word_difficulty, 'show_num': show_num + 1}
+            context = {'exam_word': ExamUtil.exam_word_difficulty, 'show_num': show_num + 1,
+                       'is_tts_play': ExamUtil.is_tts_play}
             return render(request, 'exams/exams_show.html', context)
         else:
             return ExamUtil.get_system_message_render(request, "TEST 통계 페이지 구현 하기 ", 'exam-setting')
@@ -93,6 +97,8 @@ class ExamUtil:
     exam_word_list = []
 
     exam_word_difficulty = {}
+
+    is_tts_play = False
 
     @staticmethod
     def config_save(config: Config, config_data_dict):
@@ -118,6 +124,9 @@ class ExamUtil:
         exam_word_dict['word_class'] = f"{{{exam_word_dict['word_class']}}}"
         exam_word_dict['ko_phonetic'] = f"({exam_word_dict['ko_phonetic']})"
         exam_word_dict['ko_romanize'] = f"[{exam_word_dict['ko_romanize']}]"
+
+        exam_word_dict['en_tts_url'] = ExamUtil.generate_tts('en', exam_word_dict['en_word'])
+        exam_word_dict['ko_tts_url'] = ExamUtil.generate_tts('ko', exam_word_dict['ko_word_1'])
 
         if ',' in exam_word_dict['ko_word_2']:
             exam_word_dict['ko_word_2'] = exam_word_dict['ko_word_2'].replace(',', ', ')
@@ -196,6 +205,15 @@ class ExamUtil:
         accuracy = round((correct_chars / len(correct_word)) * 100, 2)
 
         return accuracy
+
+    @staticmethod
+    def generate_tts(lang, tts_text):
+        text_to_speak = tts_text  # 플레이할 텍스트
+        tts = gTTS(text_to_speak, lang=lang)  # 언어 설정
+        tts_file_path = f'static/assets/tts/exam_{lang}_tts.mp3'  # 저장할 파일 경로
+
+        tts.save(tts_file_path)
+        return tts_file_path
 
     @staticmethod
     def get_system_message_render(request, error_message, set_urls):

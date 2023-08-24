@@ -54,6 +54,11 @@ class ExamsSetting(LoginRequiredMixin, View):
         ExamUtil.exam_word_list = random.sample(list(all_words), exam_count)  # 중복 없는 랜덤 Word 리스트 생성
         exam_word_dict = ExamUtil.get_exam_word_dict(ExamUtil.exam_word_list[0])
         ExamUtil.exam_word_difficulty = ExamUtil.set_exam_word_difficulty(exam_word_dict)
+
+        # 메소드에서 호출하면 가끔 싱크 안맞아 메인 쓰레드에서 호출해봄.
+        ExamUtil.exam_word_difficulty['en_tts_url'] = ExamUtil.generate_tts('en', exam_word_dict['en_word'])
+        ExamUtil.exam_word_difficulty['ko_tts_url'] = ExamUtil.generate_tts('ko', exam_word_dict['ko_word_1'])
+
         context = {'exam_word': ExamUtil.exam_word_difficulty, 'show_num': 1, 'is_tts_play': ExamUtil.is_tts_play}
         return render(request, 'exams/exams_show.html', context)
 
@@ -83,6 +88,11 @@ class ExamsShow(LoginRequiredMixin, View):
         if show_num < len(ExamUtil.exam_word_list):
             exam_word_dict = ExamUtil.get_exam_word_dict(ExamUtil.exam_word_list[show_num])
             ExamUtil.exam_word_difficulty = ExamUtil.set_exam_word_difficulty(exam_word_dict)
+
+            # 메소드에서 호출하면 가끔 싱크 안맞아 메인 쓰레드에서 호출해봄.
+            ExamUtil.exam_word_difficulty['en_tts_url'] = ExamUtil.generate_tts('en', exam_word_dict['en_word'])
+            ExamUtil.exam_word_difficulty['ko_tts_url'] = ExamUtil.generate_tts('ko', exam_word_dict['ko_word_1'])
+
             context = {'exam_word': ExamUtil.exam_word_difficulty, 'show_num': show_num + 1,
                        'is_tts_play': ExamUtil.is_tts_play}
             return render(request, 'exams/exams_show.html', context)
@@ -125,9 +135,6 @@ class ExamUtil:
         exam_word_dict['ko_phonetic'] = f"({exam_word_dict['ko_phonetic']})"
         exam_word_dict['ko_romanize'] = f"[{exam_word_dict['ko_romanize']}]"
 
-        exam_word_dict['en_tts_url'] = ExamUtil.generate_tts('en', exam_word_dict['en_word'])
-        exam_word_dict['ko_tts_url'] = ExamUtil.generate_tts('ko', exam_word_dict['ko_word_1'])
-
         if ',' in exam_word_dict['ko_word_2']:
             exam_word_dict['ko_word_2'] = exam_word_dict['ko_word_2'].replace(',', ', ')
         return exam_word_dict
@@ -136,7 +143,7 @@ class ExamUtil:
     def set_exam_word_difficulty(exam_word_dict):
         show_time = 6
         # 당어가 보여지는 타임 설정
-        exam_word_dict['exam_seconds'] = ((show_time - ExamUtil.exam_difficulty) * 2) * 1000
+        exam_word_dict['exam_seconds'] = ExamUtil.get_exam_seconds(ExamUtil.exam_difficulty)
         exam_word_dict['exam_redirect_seconds'] = exam_word_dict['exam_seconds'] + 500
         exam_word_dict['exam_difficulty'] = ExamUtil.exam_difficulty
 
@@ -158,6 +165,17 @@ class ExamUtil:
             exam_word_dict['exam_placeholder'] = "영어 단어를 완성 하세요"
 
         return exam_word_dict
+
+    @staticmethod
+    def get_exam_seconds(exam_difficulty):
+        difficulty_seconds = {
+            1: 10000,
+            2: 8000,
+            3: 6000,
+            4: 4000,
+            5: 3000,
+        }
+        return difficulty_seconds[exam_difficulty]
 
     @staticmethod
     def get_exam_types(level):
@@ -208,12 +226,12 @@ class ExamUtil:
 
     @staticmethod
     def generate_tts(lang, tts_text):
-        text_to_speak = tts_text  # 플레이할 텍스트
+        text_to_speak = tts_text.replace("~", "모모")  # 플레이할 텍스트
         tts = gTTS(text_to_speak, lang=lang)  # 언어 설정
         tts_file_path = f'static/assets/tts/exam_{lang}_tts.mp3'  # 저장할 파일 경로
 
         tts.save(tts_file_path)
-        return tts_file_path
+        return tts_file_path.replace('static/', '')
 
     @staticmethod
     def get_system_message_render(request, error_message, set_urls):

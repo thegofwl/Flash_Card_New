@@ -14,7 +14,7 @@
         <div class="col-md-8">
             <div class="card my-4">
                 <div class="card-header text-center">
-                    <h4><b>단 어 연 습 {{train_repeat}}-{{show_num}} {{ is_tts_play }}</b></h4>
+                    <h4><b>단 어 연 습 {{train_repeat}}-{{show_num}} </b></h4>
                 </div>
 
                 <div class="container mt-5">
@@ -78,12 +78,12 @@
 </div>
 
 <audio id="ttsPlayer_en" controls>
-    <source id="en_ttsSource" src="{% static 'assets/tts/en_tts.mp3' %}" type="audio/mpeg">
+    <source id="en_ttsSource" src="" type="audio/mpeg">
     Your browser does not support the audio element.
 </audio>
 
 <audio id="ttsPlayer_ko" controls>
-    <source id="ko_ttsSource" src="{% static 'assets/tts/ko_tts.mp3' %}" type="audio/mpeg">
+    <source id="ko_ttsSource" src="" type="audio/mpeg">
     Your browser does not support the audio element.
 </audio>
 
@@ -113,16 +113,24 @@
             const ttsPlayerEn = document.getElementById('ttsPlayer_en');
             const ttsPlayerKo = document.getElementById('ttsPlayer_ko');
             const isTtsPlay = '{{is_tts_play}}' === 'True'
+            const enTtsUrl = "{% static train_word.en_tts_url %}";
+            const koTtsUrl = "{% static train_word.ko_tts_url %}";
+
+ // {% static train_word.en_tts_url %}
+
+ // ttsPlayer_en.src = enTtsUrl;
 
             if(isTtsPlay) {
                 // 1초 후에 ttsPlayer_en 실행
                 setTimeout(() => {
+                    ttsPlayer_en.src = enTtsUrl;
                     ttsPlayerEn.load();
                     ttsPlayerEn.play();
 
                     // ttsPlayer_en 실행이 끝나면 1초 후에 ttsPlayer_ko 실행
                     ttsPlayerEn.onended = () => {
                         setTimeout(() => {
+                            ttsPlayer_ko.src = koTtsUrl;
                             ttsPlayerKo.load();
                             ttsPlayerKo.play();
                         }, 1000);

@@ -9,6 +9,7 @@ from django.views import View
 from trains.models import Train
 from users.models import Config
 from words.models import Word
+from django.db.models import Count
 
 
 # Create your views here.
@@ -94,6 +95,21 @@ class TrainsShow(LoginRequiredMixin, View):
                 train_word_dict = TrainsUtil.get_train_word_dict(TrainsUtil.train_word_list[0])
                 context = {'train_word': train_word_dict, 'show_num': 1, 'train_repeat': TrainsUtil.train_repeat}
                 return render(request, 'trains/trains_show.html', context)
+
+
+class WordPracticeHistory(View):
+    def get(self, request):
+        user = request.user
+
+        recent_practice_words = Train.objects.filter(id_user=user).order_by('-update_date')[:10]
+        frequent_practice_words = Train.objects.filter(id_user=user).values('id_word__en_word', 'id_word__ko_word_1').annotate(total_practice=Count('id_word__ko_word_1')).order_by('-total_practice')[:10]
+
+        context = {
+            'recent_practice_words': recent_practice_words,
+            'frequent_practice_words': frequent_practice_words,
+        }
+
+        return render(request, 'trains/word_practice_history.html', context)
 
 
 class TrainsUtil:

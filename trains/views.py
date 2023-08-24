@@ -56,6 +56,10 @@ class TrainsIndex(LoginRequiredMixin, View):
         TrainsUtil.train_word_list = random.sample(list(all_words), train_count)  # 중복 없는 랜덤 Word 리스트 생성
         train_word_dict = TrainsUtil.get_train_word_dict(TrainsUtil.train_word_list[0])
 
+        # 메소드에서 호출하면 가끔 싱크 안맞아 메인 쓰레드에서 호출해봄.
+        train_word_dict['en_tts_url'] = TrainsUtil.generate_tts('en', train_word_dict['en_word'])
+        train_word_dict['ko_tts_url'] = TrainsUtil.generate_tts('ko', train_word_dict['ko_word_1'])
+
         context = {'train_word': train_word_dict, 'show_num': 1, 'train_repeat': TrainsUtil.train_repeat,
                    'is_tts_play': TrainsUtil.is_tts_play}
         return render(request, 'trains/trains_show.html', context)
@@ -87,6 +91,11 @@ class TrainsShow(LoginRequiredMixin, View):
 
         if show_num < len(TrainsUtil.train_word_list):
             train_word_dict = TrainsUtil.get_train_word_dict(TrainsUtil.train_word_list[show_num])
+
+            # 메소드에서 호출하면 가끔 싱크 안맞아 메인 쓰레드에서 호출해봄.
+            train_word_dict['en_tts_url'] = TrainsUtil.generate_tts('en', train_word_dict['en_word'])
+            train_word_dict['ko_tts_url'] = TrainsUtil.generate_tts('ko', train_word_dict['ko_word_1'])
+
             context = {'train_word': train_word_dict, 'show_num': show_num + 1,
                        'train_repeat': TrainsUtil.train_repeat, 'is_tts_play': TrainsUtil.is_tts_play}
             return render(request, 'trains/trains_show.html', context)
@@ -97,6 +106,11 @@ class TrainsShow(LoginRequiredMixin, View):
                 return redirect('word-practice-history')
             else:
                 train_word_dict = TrainsUtil.get_train_word_dict(TrainsUtil.train_word_list[0])
+                # static/assets/tts/en_tts.mp3  assets/tts/en_tts.mp3
+                # 메소드에서 호출하면 가끔 싱크 안맞아 메인 쓰레드에서 호출해봄. assets/tts/en_tts.mp3 assets/tts/ko_tts.mp3
+                train_word_dict['en_tts_url'] = TrainsUtil.generate_tts('en', train_word_dict['en_word'])
+                train_word_dict['ko_tts_url'] = TrainsUtil.generate_tts('ko', train_word_dict['ko_word_1'])
+
                 context = {'train_word': train_word_dict, 'show_num': 1, 'train_repeat': TrainsUtil.train_repeat,
                            'is_tts_play': TrainsUtil.is_tts_play}
                 return render(request, 'trains/trains_show.html', context)
@@ -170,9 +184,6 @@ class TrainsUtil:
         if ',' in train_word_dict['ko_word_2']:
             train_word_dict['ko_word_2'] = train_word_dict['ko_word_2'].replace(',', ', ')
 
-        train_word_dict['en_tts_url'] = TrainsUtil.generate_tts('en', train_word_dict['en_word'])
-        train_word_dict['ko_tts_url'] = TrainsUtil.generate_tts('ko', train_word_dict['ko_word_1'])
-
         return train_word_dict
 
     @staticmethod
@@ -182,9 +193,9 @@ class TrainsUtil:
 
     @staticmethod
     def generate_tts(lang, tts_text):
-        text_to_speak = tts_text  # 플레이할 텍스트
+        text_to_speak = tts_text.replace("~", "모모")  # 플레이할 텍스트
         tts = gTTS(text_to_speak, lang=lang)  # 언어 설정
         tts_file_path = f'static/assets/tts/{lang}_tts.mp3'  # 저장할 파일 경로
 
         tts.save(tts_file_path)
-        return tts_file_path
+        return tts_file_path.replace('static/', '')

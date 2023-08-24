@@ -1,0 +1,57 @@
+.wordname {
+    font-size: 28px;
+    color: #333333;
+    font-weight: bold;
+}
+
+.wordtype {
+    font-size: 18px;
+    color: #666666;
+    margin-top: 10px;
+}
+
+.line-break {
+    width: 100%;
+    height: 1px;
+    background-color: #cccccc;
+    margin: 20px 0;
+}
+
+.a0,
+.a1 {
+    font-size: 18px;
+    color: #333333;
+}
+
+.a2 {font-size: 18px;
+    color: #333333;
+    opacity: 0.5;
+
+}
+
+.right {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.wordmean {
+    font-size: 20px;
+    color: #333333;
+    margin-top: 20px;
+}
+
+
+
+.content {
+    transition: transform 0.5s ease-in-out;
+    position: absolute;
+    width: 100%;
+}
+
+.slide-left {
+    transform: translateX(100%);
+}
+
+.slide-right {
+    transform: translateX(-100%);
+}

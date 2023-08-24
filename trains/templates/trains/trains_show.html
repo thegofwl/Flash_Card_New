@@ -1,12 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static %}
+<style>
+    #ttsPlayer_en {
+        display: none; /* TTS 플레이어를 숨김 */
+    }
+    #ttsPlayer_ko {
+        display: none; /* TTS 플레이어를 숨김 */
+    }
+</style>
 <div class="container mt-5 ">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card my-4">
                 <div class="card-header text-center">
-                    <h4><b>단 어 연 습 {{train_repeat}}-{{show_num}}</b></h4>
+                    <h4><b>단 어 연 습 {{train_repeat}}-{{show_num}} {{ is_tts_play }}</b></h4>
                 </div>
 
                 <div class="container mt-5">
@@ -69,6 +77,17 @@
     </div>
 </div>
 
+<audio id="ttsPlayer_en" controls>
+    <source id="en_ttsSource" src="{% static 'assets/tts/en_tts.mp3' %}" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<audio id="ttsPlayer_ko" controls>
+    <source id="ko_ttsSource" src="{% static 'assets/tts/ko_tts.mp3' %}" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+
 <script>
     function validateForm() {
         var enWordInput = document.getElementById("train_en_word").value;
@@ -89,6 +108,30 @@
 
         return true; // 폼 제출 허용
     }
+
+    window.onload = function () {
+            const ttsPlayerEn = document.getElementById('ttsPlayer_en');
+            const ttsPlayerKo = document.getElementById('ttsPlayer_ko');
+            const isTtsPlay = '{{is_tts_play}}' === 'True'
+
+            if(isTtsPlay) {
+                // 1초 후에 ttsPlayer_en 실행
+                setTimeout(() => {
+                    ttsPlayerEn.load();
+                    ttsPlayerEn.play();
+
+                    // ttsPlayer_en 실행이 끝나면 1초 후에 ttsPlayer_ko 실행
+                    ttsPlayerEn.onended = () => {
+                        setTimeout(() => {
+                            ttsPlayerKo.load();
+                            ttsPlayerKo.play();
+                        }, 1000);
+                    };
+                }, 1500);
+            }
+
+        };
+
 </script>
 
 {% endblock content %}

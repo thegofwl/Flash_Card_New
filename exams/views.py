@@ -7,7 +7,8 @@ from django.shortcuts import render
 from django.views import View
 
 from users.models import Config
-from words.models import Word
+
+
 
 
 # 용석 작업 - 기존 작업 유지 하고 추가 작업 합니다. - 나중에 확인 하세요.
@@ -145,7 +146,7 @@ class ExamUtil:
         return exam_type
 
     @staticmethod
-    def get_conceal_en_word(en_word):  # 장우림님 제작 메소드
+    def get_conceal_en_word(en_word):   # 정우림님 제작 메소드
         letter_list = list(en_word)
         word_length = len(en_word)
         num_concealed = random.randrange(word_length // 3, word_length // 2 + 1)

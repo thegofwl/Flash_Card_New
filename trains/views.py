@@ -3,7 +3,7 @@ import random
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import model_to_dict
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 
 from trains.models import Train
@@ -90,7 +90,7 @@ class TrainsShow(LoginRequiredMixin, View):
         else:
             TrainsUtil.train_repeat -= 1
             if TrainsUtil.train_repeat == 0:
-                return TrainsUtil.get_system_message_render(request, "연습 통계 페이지 구현 하기 ", 'trains-setting')
+                return redirect('word-practice-history')
             else:
                 train_word_dict = TrainsUtil.get_train_word_dict(TrainsUtil.train_word_list[0])
                 context = {'train_word': train_word_dict, 'show_num': 1, 'train_repeat': TrainsUtil.train_repeat}

@@ -12,9 +12,6 @@
                     <form method="post" action="{% url 'word-save' %}">
                         {% csrf_token %}
 
-                        {% for word in input_word_list %}
-                        <input type="hidden" name="input_word_list" value="{{ word }}">
-                        {% endfor %}
                         <input type="hidden" name="find_word_num" value="{{ find_word_num }}">
                         <input type="hidden" name="find_message" value="{{ find_message }}">
 

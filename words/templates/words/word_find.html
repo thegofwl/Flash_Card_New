@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container mt-5 ">
+<div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card my-4">
@@ -12,6 +12,9 @@
                     <form method="post" action="{% url 'word-save' %}">
                         {% csrf_token %}
 
+                        {% for word in input_word_list %}
+                        <input type="hidden" name="input_word_list" value="{{ word }}">
+                        {% endfor %}
                         <input type="hidden" name="find_word_num" value="{{ find_word_num }}">
                         <input type="hidden" name="find_message" value="{{ find_message }}">
 

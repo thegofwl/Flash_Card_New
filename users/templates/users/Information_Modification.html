@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .container {
+        width: 50%;
+        margin: auto;
+    }
+.profile_title {
+        padding-right: 20px;
+    }
+</style>
+<div class="container" >
+    <div style="margin-top: 5rem !important;">
+        <div class="col-12">
+
+            <div class="row justify-content-center">
+                <div class="card">
+                    <div class="card-header" style="padding-bottom:8px;">
+                        <strong style="font-size: 18px;"><i class="fas fa-user-cog"></i>&nbsp;&nbsp;내 정보</strong>
+                    </div>
+                    <div><br>
+                            {% if messages %}
+                            <ul class="messages">
+                                {% for message in messages %}
+                                <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                            </div>
+                    <div class="card-body">
+                        <table style="color:black; margin-left:10px;">
+                            <tr>
+                                <td class="profile_title">아이디</td>
+                                <td class="profile_content">{{ user.username }}</td>
+                            </tr>
+                            <tr>
+                                <td class="profile_title">이메일</td>
+                                <td class="profile_content">{{ user.email }}</td>
+                            </tr>
+                            <tr>
+                                <td class="profile_title">성</td>
+                                <td class="profile_content">{{ user.last_name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="profile_title">이름</td>
+                                <td class="profile_content">{{ user.first_name }}</td>
+                            </tr>
+
+                        </table>
+
+                        <hr>
+                        <div style="text-align: center;">
+                        <!-- <div style="margin-left: 10px;"> -->
+                            <a href="{% url 'profile_edit' %}" style="color:#d14040f2; font-size:15px;"><i class="fas fa-user-edit"></i>&nbsp;내정보수정</a>&nbsp;&middot;&nbsp;
+                            <a href="{% url 'profile_password' %}" style="color:#d14040f2; font-size:15px;"><i class="fas fa-user-lock"></i>&nbsp;비밀번호변경</a>&nbsp;&middot;&nbsp;
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

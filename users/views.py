@@ -1,15 +1,51 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model, update_session_auth_hash
+from django.shortcuts import render, redirect
+from .forms import LoginForm, RegisterForm, PasswordChangeForm, UserChangeForm
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import User
 # 회원가입 비밀번호 조건 안맞을 시 표시
 from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
-from .forms import LoginForm, RegisterForm
+
+#회원정보 변경
+def profile_edit_view(request):
+    if request.method == 'POST':
+        user_change_form = UserChangeForm(request.POST, instance=request.user)
+
+        if user_change_form.is_valid():
+            if user_change_form.has_changed():
+                user_change_form.save()
+                messages.success(request, '회원정보가 수정되었습니다.')
+            else:
+                messages.info(request, '수정 반영되지 않았습니다.')
+            return render(request, 'users/profile_edit.html')
+        else:
+            messages.error(request, '폼 데이터가 유효하지 않습니다. 다시 확인해주세요.')
+    else:
+        user_change_form = UserChangeForm(instance=request.user)
+
+    return render(request, 'users/profile_edit.html', {'user_change_form': user_change_form})
+
+#비밀번호 변경
+@login_required
+def password_edit_view(request):
+    if request.method == 'POST':
+        password_change_form = PasswordChangeForm(request.user, request.POST)
+        if password_change_form.is_valid():
+            user = password_change_form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, "비밀번호를 성공적으로 변경하였습니다.")
+            return redirect('Information_Modification')
+    else:
+        password_change_form = PasswordChangeForm(request.user)
+
+    return render(request, 'users/profile_password.html', {'password_change_form':password_change_form})
 
 
 @login_required
@@ -141,3 +177,15 @@ def find_password(request):
 
 def index(request):
     return render(request, 'users/index.html')
+
+
+def Information_Modification(request):
+    return render(request, 'users/Information_Modification.html')
+
+
+def Withdrawal(request):
+    return render(request, 'users/Withdrawal.html')
+
+def profile_edit(request):
+    return render(request, 'users/profile_edit.html')
+

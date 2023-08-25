@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+<h1>Post Form</h1>
+<h2>{% if id %} EDIT {% else %} NEW {% endif %} Post</h2>
+
+{% block content %}
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    {{form.as_p}}
+<!--    <p>-->
+<!--        <label>제목</label>-->
+<!--        <input type="text" name="title">-->
+<!--    </p>-->
+<!--    <p>-->
+<!--        <label>내용</label>-->
+<!--        <textarea name="content"></textarea>-->
+<!--    </p>-->
+<!--     <p>-->
+<!--        <label>작성일</label>-->
+<!--        <input type="date" name="published_at">-->
+<!--    </p>-->
+<!--    <p>-->
+<!--        <label>작성자</label>-->
+<!--        <input type="text" name="author">-->
+<!--    </p>-->
+
+    <input type="submit" value="Save">
+</form>
+
+{% endblock content %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container text-center mt-5">
+    <h3>word_test_message</h3>
+    <div class="form-group mb-2">
+        <textarea class="form-control" name="input_word" id="input_word" rows="10">{{ word_test_message | safe}}</textarea>
+    </div>
+</div>
+
+{% endblock content %}

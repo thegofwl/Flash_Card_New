@@ -132,7 +132,7 @@ class WordPracticeHistory(View):
         practice_data = []  # 그래프 데이터를 저장할 빈 리스트를 만듭니다.
 
         # 최근 10일간의 연습 데이터를 가져와 practice_data에 추가합니다.
-        for days_ago in range(10, 0, -1):
+        for days_ago in range(10, -1, -1):
             target_date = today - timedelta(days=days_ago)  # 현재 날짜에서 days_ago일 전의 날짜를 계산합니다.
 
             # 해당 날짜의 연습 세션 수를 가져옵니다.
@@ -203,3 +203,4 @@ class TrainsUtil:
 
         tts.save(tts_file_path)
         return tts_file_path.replace('static/', '')
+

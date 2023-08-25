@@ -5,7 +5,11 @@
         <div class="col-md-8">
             <div class="card my-4">
                 <div class="card-header text-center">
-                    <h4><b>단 어 TEST {{show_num}} - {{exam_word.exam_types}}</b></h4>
+                    {% if exam_word.exam_types == 'ko' %}
+                    <h4><b>단 어 TEST {{show_num}} - 영어단어 제시</b></h4>
+                    {% elif exam_word.exam_types == 'en' %}
+                    <h4><b>단 어 TEST {{show_num}} - 한글 뜻 제시</b></h4>
+                    {% endif %}
                 </div>
 
                 <div class="container mt-5">

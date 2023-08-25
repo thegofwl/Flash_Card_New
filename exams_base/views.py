@@ -37,7 +37,12 @@ class ExamsSetting(LoginRequiredMixin, View):
             'exam_seconds': exam_seconds,
             'exam_tts_play': exam_tts_play,
         }
+        temp_data_dict = {
+            'exam_types': exam_types,
+            'hint_type': hint_type,
+        }
         print(config_data_dict)
+        print(temp_data_dict)
         try:
             config = Config.objects.get(id_user=user.id)
             ExamUtil.config_save(config, config_data_dict)
@@ -76,7 +81,7 @@ class ExamsShow(LoginRequiredMixin, View):
             context = {'exam_word': exam_word_with_opt, 'show_num': show_num + 1}
             return render(request, 'exams_base/exam_base_show.html', context)
         else:
-            return ExamUtil.get_system_message_render(request, "TEST 통계 페이지 구현 하기 ", 'exam-setting')
+            return ExamUtil.get_system_message_render(request, "TEST 통계 페이지 구현 하기 ", 'exam_base-setting')
 
 
 class ExamUtil:
@@ -103,7 +108,6 @@ class ExamUtil:
 
     @staticmethod
     def get_exam_word_dict(exam_word):
-        print(exam_word)
         exam_word_dict = model_to_dict(exam_word)
         exam_word_dict['en_phonetic'] = ExamUtil.get_en_phonetics(exam_word_dict['en_phonetic'])
         exam_word_dict['word_class'] = f"{{{exam_word_dict['word_class']}}}"
@@ -124,14 +128,15 @@ class ExamUtil:
         if exam_word_dict['exam_types'] == 'en':
             exam_word_dict['exam_question'] = exam_word_dict['ko_word_1']
             exam_word_dict['exam_hint'] = exam_word_dict['en_word']
+            exam_word_dict['hint_type'] = ExamUtil.hint_type
+
+            if exam_word_dict['hint_type'] == 1:
+                exam_word_dict['exam_hint'] = len(exam_word_dict['exam_hint'])
+            elif exam_word_dict['hint_type'] == 2:
+                exam_word_dict['exam_hint'] = ExamUtil.get_conceal_en_word(exam_word_dict['exam_hint'])
         else:
             exam_word_dict['exam_question'] = exam_word_dict['en_word']
 
-        exam_word_dict['hint_type'] = ExamUtil.hint_type
-        if exam_word_dict['hint_type'] == 1:
-            exam_word_dict['exam_hint'] = len(exam_word_dict['exam_hint'])
-        elif exam_word_dict['hint_type'] == 2:
-            exam_word_dict['exam_hint'] = ExamUtil.get_conceal_en_word(exam_word_dict['exam_hint'])
 
         return exam_word_dict
 

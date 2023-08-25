@@ -48,8 +48,9 @@ class ExamsSetting(LoginRequiredMixin, View):
 
         exam_count = int(exam_word_count)
         ExamUtil.exam_type = exam_types
-        ExamUtil.hint_type = int(hint_type)
         ExamUtil.exam_seconds = int(exam_seconds)
+        if hint_type:
+            ExamUtil.hint_type = int(hint_type)
 
         all_words = Word.objects.all()
         ExamUtil.exam_word_list = random.sample(list(all_words), exam_count)

@@ -1,4 +1,10 @@
 import random
+import datetime
+import json
+
+from django.db.models import Avg, Count
+from django.http import JsonResponse
+from django.db.models.functions import TruncDate
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
@@ -83,6 +89,7 @@ class ExamsShow(LoginRequiredMixin, View):
         exam.exam_right, exam.exam_point = ExamUtil.get_exam_right(exam.exam_type, exam.in_word, en_word, ko_word_1)
         exam.id_word = ExamUtil.exam_word_list[show_num - 1]
         exam.id_user = user
+        exam.exam_difficulty = ExamUtil.exam_difficulty  ## 난이도 값이 저장안되고 초기화돼서 추가하였습니다
         exam.save()
 
         if show_num < len(ExamUtil.exam_word_list):
@@ -244,9 +251,84 @@ def home(request):
 
 
 
-def Word_Test_History(request):
-    return render(request, 'exams/Word_Test_History.html')
+class WordTestScore(View):
+
+    def get(self, request):
+        scores = Exam.objects.filter(id_user=request.user) \
+            .annotate(date=TruncDate('reg_date')) \
+            .values('date') \
+            .annotate(average_score=Avg('exam_point')) \
+            .order_by('date')
+
+        difficulty_levels = [1, 2, 3, 4, 5]  # 어려움 난이도 레벨 리스트
+
+        difficulty_scores = []
+        for difficulty in difficulty_levels:
+            average_score = Exam.objects.filter(id_user=request.user, exam_difficulty=difficulty) \
+                .annotate(date=TruncDate('reg_date')) \
+                .values('date') \
+                .annotate(average_score=Avg('exam_point')) \
+                .filter(exam_difficulty=difficulty)  # 해당 난이도의 평균 점수 계산
+            print(difficulty)
+            print(average_score)
+            if average_score.exists():
+                print(difficulty)
+                difficulty_scores.append({'difficulty': difficulty, 'average_score': average_score[0]['average_score']})
+            else:
+                difficulty_scores.append({'difficulty': difficulty, 'average_score': 0.0})
+
+        date_list = []
+        score_list = []
+        for score in scores:
+            date_list.append(score['date'].strftime('%Y-%m-%d'))
+            score_list.append(score['average_score'])
+
+        test_count_by_date = Exam.objects.filter(id_user=request.user) \
+            .annotate(date=TruncDate('reg_date')) \
+            .values('date') \
+            .annotate(test_count=Count('id')) \
+            .order_by('date')
+
+        test_count_dict = {}
+        for test_count in test_count_by_date:
+            test_count_dict[test_count['date']] = test_count['test_count']
+
+        average_scores = [score_list[i] / test_count_dict.get(date_list[i], 1) for i in range(len(score_list))]
+
+        context = {
+            'date_list': json.dumps(date_list),
+            'average_scores': json.dumps(average_scores),
+            'test_counts': test_count_dict,
+            'difficulty_scores': difficulty_scores,
+        }
+        return render(request, 'exams/Word_Test_Score.html', context)
 
 
-def Word_Test_Score(request):
-    return render(request, 'exams/Word_Test_Score.html')
+class Word_Test_History(View):
+    def get(self, request):
+        test_counts_by_date = Exam.objects.filter(id_user=request.user) \
+            .annotate(tested_date=TruncDate('reg_date')) \
+            .values('tested_date') \
+            .annotate(test_count=Count('id')) \
+            .order_by('-tested_date')[:10]
+
+        difficulty_levels = [1, 2, 3, 4, 5]
+
+        test_counts_by_difficulty = []
+        for level in difficulty_levels:
+            test_count = Exam.objects.filter(id_user=request.user, exam_difficulty=level) \
+                .values('exam_difficulty') \
+                .annotate(test_count=Count('id')) \
+                .order_by('exam_difficulty') \
+                .first()
+
+            if test_count:
+                test_counts_by_difficulty.append({'difficulty_level': level, 'test_count': test_count['test_count']})
+            else:
+                test_counts_by_difficulty.append({'difficulty_level': level, 'test_count': 0})
+
+        context = {
+            'test_counts_by_date': test_counts_by_date,
+            'test_counts_by_difficulty': test_counts_by_difficulty,
+        }
+        return render(request, 'exams/Word_Test_History.html', context)

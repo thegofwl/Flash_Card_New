@@ -45,17 +45,16 @@ class WordInput(LoginRequiredMixin, View):
             error_message = "단어를 입력하세요."
             return WordUtil.get_system_message_render(request, error_message, 'word-input')
 
-        input_word_list = WordUtil.get_word_list(input_word)
-        find_word_list_dict = WordUtil.find_reg_word(input_word_list)
+        WordUtil.input_word_list = WordUtil.get_word_list(input_word)
+        find_word_list_dict = WordUtil.find_reg_word(WordUtil.input_word_list)
         input_word_list = find_word_list_dict['input_word_list']
         find_message = find_word_list_dict['find_message']
 
         if len(input_word_list) > 0:
             find_word_dict = WordUtil.get_daum_dict(input_word_list[0])
             show_word_list = WordUtil.get_show_word_list(find_word_dict['is_success'], input_word_list, 0)
-            context = {'show_word_list': show_word_list, 'input_word_list': input_word_list,
-                       'find_message': find_message,
-                       'find_word_num': 0, 'find_word_dict': find_word_dict}
+            context = {'show_word_list': show_word_list, 'find_message': find_message, 'find_word_num': 0,
+                       'find_word_dict': find_word_dict}
             return render(request, 'words/word_find.html', context)
 
         else:
@@ -71,16 +70,16 @@ class WordSave(LoginRequiredMixin, View):
     def post(self, request):
         word = WordUtil.get_word(request)
         word.save()
-        input_word_list = request.POST.getlist('input_word_list')
         find_word_num = int(request.POST['find_word_num'])
         find_message = request.POST['find_message']
 
-        if find_word_num < len(input_word_list) - 1:
+        if find_word_num < len(WordUtil.input_word_list) - 1:
             find_word_num += 1
-            find_word_dict = WordUtil.get_daum_dict(input_word_list[find_word_num])
-            show_word_list = WordUtil.get_show_word_list(find_word_dict['is_success'], input_word_list, find_word_num)
-            context = {'show_word_list': show_word_list, 'input_word_list': input_word_list,
-                       'find_message': find_message, 'find_word_num': find_word_num, 'find_word_dict': find_word_dict}
+            find_word_dict = WordUtil.get_daum_dict(WordUtil.input_word_list[find_word_num])
+            show_word_list = WordUtil.get_show_word_list(find_word_dict['is_success'], WordUtil.input_word_list,
+                                                         find_word_num)
+            context = {'show_word_list': show_word_list, 'find_message': find_message, 'find_word_num': find_word_num,
+                       'find_word_dict': find_word_dict}
             return render(request, 'words/word_find.html', context)
         else:
             return redirect('words')
@@ -162,6 +161,8 @@ class WordReset(LoginRequiredMixin, View):
 
 
 class WordUtil:
+    input_word_list = []
+
     @staticmethod
     def get_word_list(input_word):
         input_word = input_word.replace(" ", "").replace("\r", "").replace("\n", "")

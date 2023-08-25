@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+    #ttsPlayer_en {
+        display: none; /* TTS 플레이어를 숨김 */
+    }
+    #ttsPlayer_ko {
+        display: none; /* TTS 플레이어를 숨김 */
+    }
+</style>
+<div class="container mt-5 ">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card my-4">
+                <div class="card-header text-center">
+                    <h4><b>단 어 TEST {{show_num}}</b></h4>
+                </div>
+
+                <div class="container mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <DIV class="row">
+                                <div><span class="wordname">{{ exam_word.exam_question }}</span></div>
+                                <div class="wordtype">{{ exam_word.word_class }}</div>
+
+                                {% if exam_word.exam_difficulty == 1 %}
+                                <div class="line-break"></div>
+                                <div class="right">
+                                    <span class="a0">{{ exam_word.en_phonetic }}</span>
+                                    <span class="a2"> {{ exam_word.ko_phonetic }}</span>
+                                </div>
+                                <div class="wordmean">{{ exam_word.ko_word_1 }}</div>
+                                <div class="wordmean">{{ exam_word.ko_word_2 }}</div>
+                                {% endif %}
+
+                                {% if exam_word.exam_difficulty == 2 %}
+                                <div class="line-break"></div>
+                                <div class="right">
+                                    <span class="a0">{{ exam_word.en_phonetic }}</span>
+                                    <span class="a2"> {{ exam_word.ko_phonetic }}</span>
+                                </div>
+                                <div class="wordmean">{{ exam_word.ko_word_2 }}</div>
+                                {% endif %}
+
+                                {% if exam_word.exam_difficulty == 3 %}
+                                <div class="line-break"></div>
+                                <div class="wordmean">{{ exam_word.ko_word_2 }}</div>
+                                {% endif %}
+
+                            </DIV>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container mt-5 mb-3  d-flex justify-content-center">
+                    <div class="progress col-sm-9">
+                        <div class="progress-bar bg-success" id="progressBar" role="progressbar" aria-valuenow="0"
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+
+                <div class="card-body ">
+                    <form class="form-inline" action="{% url 'exam-show' %}"
+                          method="post" onsubmit="return validateForm();">
+                        {% csrf_token %}
+                        <input type="hidden" name="show_num" value="{{show_num}}">
+
+                        <div class="row mb-3 d-flex justify-content-center">
+                            <div class="col-sm-9 d-flex justify-content-center">
+                                <input type="text" id="word_user_input" name="word_user_input" autofocus
+                                       class="form-control" placeholder="{{ exam_word.exam_placeholder }}">
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" id="submitBtn" class="btn btn-primary mt-3">확 인</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<audio id="ttsPlayer_en" controls>
+    <source id="en_ttsSource" src="{% static exam_word.en_tts_url %}" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<audio id="ttsPlayer_ko" controls>
+    <source id="ko_ttsSource" src="{% static exam_word.ko_tts_url %}" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<script>
+    function updateProgressBar() {
+      let progressBar = document.getElementById('progressBar');
+      let timeLeft = {{exam_word.exam_seconds}}; // 입력 시간 (밀리초)
+      let interval = 50; // 갱신 간격 (밀리초)
+      let startTime = new Date().getTime();
+      let updateInterval = setInterval(() => {
+        let currentTime = new Date().getTime();
+        let elapsedTime = currentTime - startTime;
+        let progress = (elapsedTime / timeLeft) * 100;
+        progressBar.style.width = progress + '%';
+        progressBar.setAttribute('aria-valuenow', progress);
+        if (elapsedTime >= timeLeft) {
+          clearInterval(updateInterval);
+          progressBar.style.backgroundColor = '#dc3545'; // 빨간색으로 변경
+        }
+      }, interval);
+    }
+    updateProgressBar();
+</script>
+
+
+<script>
+    function submitForm() {
+        document.getElementById("submitBtn").click();
+    }
+    setTimeout(submitForm, {{exam_word.exam_redirect_seconds}}); // 3초 후에 확인 버튼을 자동으로 클릭하여 폼 데이터 전송
+
+</script>
+
+
+<script>
+    window.onload = function () {
+        const ttsPlayerEn = document.getElementById('ttsPlayer_en');
+        const ttsPlayerKo = document.getElementById('ttsPlayer_ko');
+        const isTtsPlay = '{{is_tts_play}}' === 'True'
+
+        if (isTtsPlay) {
+            if ('{{exam_word.exam_difficulty}}' === '1') {
+                setTimeout(() => {
+                    ttsPlayerEn.load();
+                    ttsPlayerEn.play();
+
+                    // ttsPlayer_en 실행이 끝나면 1초 후에 ttsPlayer_ko 실행
+                    ttsPlayerEn.onended = () => {
+                        setTimeout(() => {
+                            ttsPlayerKo.load();
+                            ttsPlayerKo.play();
+                        }, 1000);
+                    };
+                }, 1500);
+            } else if ('{{exam_word.exam_difficulty}}' === '2') {
+                setTimeout(() => {
+                    const ttsPlayerEn = document.getElementById('ttsPlayer_en');
+                    ttsPlayerEn.load();
+                    ttsPlayerEn.play();
+                }, 1500);
+            } else if ('{{exam_word.exam_difficulty}}' === '3') {
+                setTimeout(() => {
+                    const ttsPlayerKo = document.getElementById('ttsPlayer_ko');
+                    ttsPlayerKo.load();
+                    ttsPlayerKo.play();
+                }, 1500);
+            } else {
+                if ('{{exam_word.exam_types}}' === 'ko') {
+                    setTimeout(() => {
+                        const ttsPlayerEn = document.getElementById('ttsPlayer_en');
+                        ttsPlayerEn.load();
+                        ttsPlayerEn.play();
+                    }, 1500);
+                } else {
+                    setTimeout(() => {
+                        const ttsPlayerKo = document.getElementById('ttsPlayer_ko');
+                        ttsPlayerKo.load();
+                        ttsPlayerKo.play();
+                    }, 1500);
+                }
+            }
+        }
+
+    };
+</script>
+
+{% endblock content %}
